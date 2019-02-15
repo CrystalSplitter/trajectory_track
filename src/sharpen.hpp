@@ -2,4 +2,4 @@
 
 static void help(char* progName);
 int sharpenProc(int argc, char* argv[]);
-void sharpen(const cv::Mat& myImage, cv::Mat& Result);
+void sharpen(cv::Mat& m);
