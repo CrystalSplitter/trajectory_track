@@ -1,0 +1,24 @@
+#include <stdlib.h>
+#include <opencv2/opencv.hpp>
+#include "tracker.hpp"
+
+using namespace 
+
+Tracker::Tracker()
+{
+    
+}
+
+~Tracker::Tracker()
+{
+    // Nothing to do at this time.
+}
+
+void setInit(cv::InputArray img, const Rect2d& boundingBox) {
+    
+}
+
+cv::Point2D Tracker::getPosition()
+{
+    
+}

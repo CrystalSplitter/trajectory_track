@@ -1,0 +1,15 @@
+#include <opencv2/opencv.hpp>
+
+#ifndef __TRACKER_HPP__
+#define __TRACKER_HPP__
+
+class Tracker {
+public:
+    Tracker::Tracker();
+    ~Tracker::Tracker();
+    void setInit(cv::InputArray img, const Rect2d& boundingBox)
+private:
+    cv::Ptr<TrackerMOSSE> tracker;
+};
+
+#endif /* __TRACKER_HPP__ */

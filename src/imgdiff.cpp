@@ -2,7 +2,6 @@
 
 #include <opencv2/opencv.hpp>
 
-
 void ImgDiff::diff(cv::Mat& to,
                    cv::Mat& from,
                    cv::Mat& diff,
