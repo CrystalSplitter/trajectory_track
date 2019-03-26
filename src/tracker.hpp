@@ -7,11 +7,12 @@ static void help(char* progName);
 namespace tr
 {
     int trackerProc(cv::VideoCapture& vidCap, int frameStart);
-    void updateMatrices(
+    int updateMatrices(
             cv::VideoCapture& vidCap,
             cv::Mat& frame,
             cv::Mat& shrinkFrame,
             cv::Mat& grey,
+            cv::Mat& oldgrey,
             cv::Size newSize);
     void sharpen(cv::Mat& m);
 };

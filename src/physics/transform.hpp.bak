@@ -1,0 +1,18 @@
+#pragma once
+
+#include "v3.hpp"
+
+class Transform
+{
+public:
+    Transform();
+    ~Transform();
+    Transform(x, y, z);
+
+private:
+    V3 pos_;
+    float quai_ = 0.0f;
+    float quaj_ = 0.0f;
+    float quak_ = 0.0f;
+    float quaw_ = 1.0f;
+};

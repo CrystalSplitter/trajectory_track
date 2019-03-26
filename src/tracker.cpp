@@ -25,23 +25,28 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
     vidCap.read(frame); // Get the first frame.
     cv::Mat shrinkFrame;
     cv::Mat greysc;
+    cv::Mat oldgreysc;
     cv::VideoWriter output;
     
     // Calculate the size of the rescale.
     float aspectRatio = ((float) frame.cols)/((float) frame.rows);
     cv::Size newSize = cv::Size(TR_NEWWIDTH,
             (int) TR_NEWWIDTH/aspectRatio);
+
+    // Open a video output stream.
     output.open("YAY.avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'),
                 40, newSize, true);
-
     
+    cv::Mat diffFrame(cv::Mat(newSize, CV_8UC1));
+    cv::Mat diffMask(cv::Mat(newSize, CV_8UC1));
     // Get the first frame.
-    tr::updateMatrices(vidCap, frame, shrinkFrame, greysc, newSize);
+    tr::updateMatrices(vidCap, frame, shrinkFrame, greysc, oldgreysc, newSize);
     
     
     // Capture frame-by-frame
     for (int i = 1; i < frameStart; ++i) {
-        tr::updateMatrices(vidCap, frame, shrinkFrame, greysc, newSize);
+        tr::updateMatrices(vidCap, frame, shrinkFrame, greysc,
+                oldgreysc, newSize);
     }
     cv::Rect2d bbox(35*2, 3*2, 70*2, 20*2);  // Create bounding box.
     // Display the bounding box.
@@ -50,9 +55,17 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
     // Create the tracker.
     tracker = cv::TrackerMOSSE::create();
     tracker->init(greysc, bbox);
-
-    while(true) {
-        tr::updateMatrices(vidCap, frame, shrinkFrame, greysc, newSize);
+    
+    // Create the difference calculator.
+    ImgDiff imgdiff = ImgDiff();
+    while(tr::updateMatrices(
+                vidCap,
+                frame,
+                shrinkFrame,
+                greysc,
+                oldgreysc,
+                newSize))
+    {
         cv::rectangle(shrinkFrame, bbox, cv::Scalar(255, 0, 0), 1, 1);
   
         // If the frame is empty, break immediately
@@ -66,9 +79,14 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
         } else {
             std::cout << "Failing to track" << std::endl;
         }
-
+        
         // Display the resulting frame
         cv::imshow("Frame", shrinkFrame);
+
+        imgdiff.diff(greysc, oldgreysc, diffFrame, 4);
+        imgdiff.diffThreshCentre(diffFrame, 20, diffMask);
+
+        cv::imshow("Diff", diffMask);
         output.write(shrinkFrame);
  
         // Press  ESC on keyboard to exit
@@ -77,7 +95,6 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
             break;
         }
     }
-    vidCap.release();
     output.release();
     return 0;
     /*
@@ -122,17 +139,24 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
     */
 }
 
-void tr::updateMatrices(
+int tr::updateMatrices(
         cv::VideoCapture& vidCap,
         cv::Mat& frame,
         cv::Mat& shrinkFrame,
         cv::Mat& grey,
+        cv::Mat& oldgrey,
         cv::Size newSize)
 {
     vidCap.read(frame);
+    // If the frame is empty, break immediately
+    if (frame.empty()) {
+        return 0;
+    }
     cv::resize(frame, shrinkFrame, newSize);
+    grey.copyTo(oldgrey);
     cv::cvtColor(shrinkFrame, grey,
                  cv::ColorConversionCodes::COLOR_BGR2GRAY, 0);
+    return 1;
 }
 
 void mask(cv::Mat& m)

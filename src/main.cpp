@@ -3,8 +3,7 @@
 #include <stdexcept>
 #include "inputhandler.hpp"
 #include "tracker.hpp"
-
-//using namespace tr;
+#include "physics/rigidbody.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -24,5 +23,9 @@ int main(int argc, char* argv[])
         std::cout << "Unable to open video. Quiting." << std::endl;
         return -1;
     }
-    return tr::trackerProc(vidCap, ihandle.frameStart());
+
+    tr::trackerProc(vidCap, ihandle.frameStart());
+    // Release the video.
+    vidCap.release();
+    return 0;
 }

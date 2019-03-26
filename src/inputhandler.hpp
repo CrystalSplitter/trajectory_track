@@ -6,6 +6,7 @@ class InputHandler
 public:
     InputHandler();
     InputHandler(int argc, char* argv[]);
+    void printUsage();
     void readInput(int argc, char* argv[]);
     std::string vidPath();
     int frameStart();

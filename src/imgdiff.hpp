@@ -12,7 +12,8 @@ public:
     /* Calculate the average pixel position of pixels
      * that exceed the threshold in any channel.
      */
-    static cv::Point diffThreshCentre(cv::Mat& diff, unsigned char threshold);
+    static cv::Point diffThreshCentre(cv::Mat& diff, unsigned char threshold,
+            cv::Mat& output);
 };
 
 #endif /* __IMGDIFF_HPP__ */
