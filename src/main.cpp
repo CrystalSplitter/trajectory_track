@@ -18,7 +18,13 @@ int main(int argc, char* argv[])
 
     std::cout << ihandle.vidPath() << std::endl;
     // capture the video and check validity.
-    cv::VideoCapture vidCap(ihandle.vidPath());
+    // cv::VideoCapture vidCap(ihandle.vidPath());
+    cv::VideoCapture vidCap;
+    try {
+        vidCap = cv::VideoCapture(0);
+    } catch (std::exception e) {
+        vidCap = cv::VideoCapture(-1);
+    }
     if (!vidCap.isOpened()) {
         std::cout << "Unable to open video. Quiting." << std::endl;
         return -1;
