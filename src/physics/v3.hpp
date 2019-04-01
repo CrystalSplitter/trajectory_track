@@ -9,13 +9,13 @@ public:
     float x;
     float y;
     float z;
-    V3 add(V3& other);
-    V3 scale(V3& other);
-    float dot(V3& other);
+    V3 add(const V3& other) const;
+    V3 scale(const float other) const;
+    float dot(const V3& other) const;
     /**
      * This is just an alias for add().
      */
-    V3 operator+(V3& other);
-    V3 operator-();
-    V3 operator-(V3& other);
+    V3 operator+(const V3& other) const;
+    V3 operator-() const;
+    V3 operator-(const V3& other) const;
 };

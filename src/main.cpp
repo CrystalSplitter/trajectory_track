@@ -8,6 +8,7 @@
 int main(int argc, char* argv[])
 {
     // Set up the input handler to handle any important values.
+    
     InputHandler ihandle;
     try {
         ihandle.readInput(argc, argv);
@@ -15,7 +16,7 @@ int main(int argc, char* argv[])
         std::cout << e.what() << std::endl;
         return -1;
     }
-
+    
     std::cout << ihandle.vidPath() << std::endl;
     // capture the video and check validity.
     cv::VideoCapture vidCap(ihandle.vidPath());
@@ -27,5 +28,6 @@ int main(int argc, char* argv[])
     tr::trackerProc(vidCap, ihandle.frameStart());
     // Release the video.
     vidCap.release();
+    
     return 0;
 }

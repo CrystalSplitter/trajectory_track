@@ -9,9 +9,10 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 file( GLOB SOURCES "src/*.cpp" )
+file( GLOB PHYS_SOURCES "src/physics/*.cpp" )
 
 # Set the executable (and where it's sources lie)
-add_executable( ${PROJECT_NAME} ${SOURCES} )
+add_executable( ${PROJECT_NAME} ${SOURCES} ${PHYS_SOURCES} )
 
 # Import OpenCV
 find_package( OpenCV REQUIRED )
