@@ -14,6 +14,8 @@ namespace tr
             cv::Mat& grey,
             cv::Mat& oldgrey,
             cv::Size newSize);
+    cv::Rect2d getBBox(double centreX, double centreY, double width, double height);
+    cv::Rect2d clipBBox(cv::Rect2d bbox, double imgW, double imgH);
     void sharpen(cv::Mat& m);
 };
 

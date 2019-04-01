@@ -4,19 +4,18 @@
 #include <stdlib.h>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 
 #include "inputhandler.hpp"
 #include "imagereduce.hpp"
 #include "tracker.hpp"
 #include "imgdiff.hpp"
 
+
 const int TR_NEWWIDTH = 128*2;
 
-static void help(char* progName)
-{
-    std::cout << std::endl << "Sharpens an image based using a kernel"
-        << std::endl;
-}
+const int TR_BBOX_WIDTH = 35;
+const int TR_BBOX_HEIGHT = 35;
 
 int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
 {
@@ -43,12 +42,15 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
     tr::updateMatrices(vidCap, frame, shrinkFrame, greysc, oldgreysc, newSize);
     
     
-    // Capture frame-by-frame
+    // Skip ahead specified number of frames.
     for (int i = 1; i < frameStart; ++i) {
         tr::updateMatrices(vidCap, frame, shrinkFrame, greysc,
                 oldgreysc, newSize);
     }
-    cv::Rect2d bbox(35*2, 3*2, 70*2, 20*2);  // Create bounding box.
+    
+    cv::Rect2d bbox = tr::getBBox(shrinkFrame.cols/2, shrinkFrame.rows/2, 40, 40);
+    bbox = tr::clipBBox(bbox, shrinkFrame.cols, shrinkFrame.rows);
+    
     // Display the bounding box.
     cv::rectangle(shrinkFrame, bbox, cv::Scalar(255, 0, 0), 1, 1);
     
@@ -58,6 +60,7 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
     
     // Create the difference calculator.
     ImgDiff imgdiff = ImgDiff();
+    unsigned int counter = 0;
     while(tr::updateMatrices(
                 vidCap,
                 frame,
@@ -80,19 +83,21 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
             std::cout << "Failing to track" << std::endl;
         }
         
+        /*
         // Display the resulting frame
         cv::imshow("Frame", shrinkFrame);
-
+        */	
         imgdiff.diff(greysc, oldgreysc, diffFrame, 4);
         imgdiff.diffThreshCentre(diffFrame, 20, diffMask);
 
-        cv::imshow("Diff", diffMask);
+        //cv::imshow("Diff", diffMask);
         output.write(shrinkFrame);
  
         // Press  ESC on keyboard to exit
-        char c = (char) cv::waitKey(25);
-        if (c == 27) {
+        if (counter > 240) {
             break;
+        } else {
+            counter++;
         }
     }
     output.release();
@@ -152,11 +157,40 @@ int tr::updateMatrices(
     if (frame.empty()) {
         return 0;
     }
-    cv::resize(frame, shrinkFrame, newSize);
+    // Create a temporary matrix to store the flipped matrix.
+    cv::Mat shrinkFramePreFlip = cv::Mat(newSize, CV_8UC3);
+    cv::resize(frame, shrinkFramePreFlip, newSize);
+    // Flip horizontally and vertically.
+    // Assign that to the shrinkFrame.
+    cv::flip(shrinkFramePreFlip, shrinkFrame, -1);
+    // Copy the old greyscale.
     grey.copyTo(oldgrey);
+    // Load the new greyscale.
     cv::cvtColor(shrinkFrame, grey,
                  cv::ColorConversionCodes::COLOR_BGR2GRAY, 0);
     return 1;
+}
+
+cv::Rect2d tr::getBBox(double centreX, double centreY, double width, double height)
+{
+    // Create bounding box.
+    cv::Rect2d bbox(
+            centreX - width*0.5,
+            centreY - height*0.5,
+            width,
+            height
+    );
+    return bbox;
+}
+
+cv::Rect2d tr::clipBBox(cv::Rect2d bbox, double imgW, double imgH)
+{
+    double tlX = std::max(bbox.x, 0.0);
+    double tlY = std::max(bbox.y, 0.0);
+    double brX = std::min(bbox.x + bbox.width, imgW);
+    double brY = std::min(bbox.y + bbox.height, imgH);
+    cv::Rect2d newBbox(tlX, tlY, brX, brY);
+    return newBbox;
 }
 
 void mask(cv::Mat& m)
