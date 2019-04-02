@@ -19,16 +19,28 @@ int main(int argc, char* argv[])
     
     std::cout << ihandle.vidPath() << std::endl;
     // capture the video and check validity.
-    // cv::VideoCapture vidCap(ihandle.vidPath());
     cv::VideoCapture vidCap;
-    try {
-        vidCap = cv::VideoCapture(0);
-    } catch (std::exception e) {
-        vidCap = cv::VideoCapture(-1);
-    }
-    if (!vidCap.isOpened()) {
-        std::cout << "Unable to open video. Quiting." << std::endl;
-        return -1;
+    if (ihandle.useCamera()) {
+        // We're trying to record from the camera.
+        std::cout << "Streaming video camera..." << std::endl;
+        try {
+            vidCap = cv::VideoCapture(0);
+        } catch (std::exception e) {
+            vidCap = cv::VideoCapture(-1);
+        }
+        if (!vidCap.isOpened()) {
+            std::cout << "Unable to open video. Quiting." << std::endl;
+            return -1;
+        }
+    } else {
+        std::cout << "Loading video..." << std::endl;
+        try {
+            vidCap = cv::VideoCapture(ihandle.vidPath());
+        } catch (cv::Exception e) {
+            std::cout << "Unable to open video: " << ihandle.vidPath()
+                      << ". Quiting." << std::endl;
+            return -1;
+        }
     }
 
     tr::trackerProc(vidCap, ihandle.frameStart());

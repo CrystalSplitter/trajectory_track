@@ -25,9 +25,15 @@ void InputHandler::readInput(int argc, char* argv[])
         this->printUsage();
         throw std::runtime_error("Could not read input.");
     }
-    char* resolvedPath = (char*) std::calloc(sizeof(char),  1024);
-    realpath(argv[vidIndex_], resolvedPath);
-    vidPath_ = std::string(resolvedPath);
+    if (argv[1][0] == '0') {
+        // We are opening a camera.
+        useCamera_ = true;
+    } else {
+        char* resolvedPath = (char*) std::calloc(sizeof(char),  1024);
+        realpath(argv[vidIndex_], resolvedPath);
+        vidPath_ = std::string(resolvedPath);
+        useCamera_ = false;
+    }
     if (argc > 2) {
         frameStart_ = std::stoi(argv[frameStartIndex_]);
     }
@@ -41,4 +47,9 @@ std::string InputHandler::vidPath()
 int InputHandler::frameStart()
 {
     return frameStart_;
+}
+
+bool InputHandler::useCamera()
+{
+    return useCamera_;
 }

@@ -83,18 +83,16 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
             std::cout << "Failing to track" << std::endl;
         }
         
-        /*
-        // Display the resulting frame
-        cv::imshow("Frame", shrinkFrame);
-        */	
         imgdiff.diff(greysc, oldgreysc, diffFrame, 4);
         imgdiff.diffThreshCentre(diffFrame, 20, diffMask);
 
-        //cv::imshow("Diff", diffMask);
+        // Display the resulting frames.
+        cv::imshow("Diff", diffMask);
+        cv::imshow("Frame", shrinkFrame);
         output.write(shrinkFrame);
  
         // Press  ESC on keyboard to exit
-        if (counter > 240) {
+        if (counter > 360) {
             break;
         } else {
             counter++;
@@ -183,6 +181,7 @@ cv::Rect2d tr::getBBox(double centreX, double centreY, double width, double heig
     return bbox;
 }
 
+
 cv::Rect2d tr::clipBBox(cv::Rect2d bbox, double imgW, double imgH)
 {
     double tlX = std::max(bbox.x, 0.0);
@@ -192,6 +191,7 @@ cv::Rect2d tr::clipBBox(cv::Rect2d bbox, double imgW, double imgH)
     cv::Rect2d newBbox(tlX, tlY, brX, brY);
     return newBbox;
 }
+
 
 void mask(cv::Mat& m)
 {
