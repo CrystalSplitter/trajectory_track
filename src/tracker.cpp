@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <chrono>
+#include <stdexcept>
 #include <algorithm>
 
 #include "inputhandler.hpp"
@@ -42,6 +43,7 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
     // Get the first frame.
     tr::updateMatrices(vidCap, frame, shrinkFrame, greysc, oldgreysc, newSize);
     
+    cv::Mat colourMask = cv::Mat(newSize, CV_8UC1);
     
     // Skip ahead specified number of frames.
     for (int i = 1; i < frameStart; ++i) {
@@ -89,11 +91,9 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
 
         // Display the resulting frames.
         //cv::imshow("Diff", diffMask);
-        //cv::imshow("Frame", shrinkFrame);
         output.write(shrinkFrame);
         cv::imshow("Display Image", shrinkFrame);
-        cv::waitKey(0);
-        return 0;
+        cv::waitKey(20);
  
         // Press  ESC on keyboard to exit
         if (counter > 360) {
@@ -197,25 +197,44 @@ cv::Rect2d tr::clipBBox(cv::Rect2d bbox, double imgW, double imgH)
 }
 
 
-void mask(cv::Mat& m)
+void colourMask(
+        cv::Mat& m,
+        cv::Mat& output,
+        cv::Vec3b minColourHSV,
+        cv::Vec3b maxColourHSV)
 {
+    if (output.channels() > 1) {
+        throw std::runtime_error("Colour mask output matrix has too many dimenions.");
+    }
+
     cv::Mat hsv;
     cv::cvtColor(m, hsv, cv::ColorConversionCodes::COLOR_BGR2HSV, 0);
+
     for (size_t i = 0; i < hsv.rows; ++i) {
         unsigned char* hsvRowStart = hsv.ptr<unsigned char>(i);
-        unsigned char* mRowStart = m.ptr<unsigned char>(i);
-        for (size_t j = 0; j < hsv.cols*hsv.channels(); j += 3) {
+        unsigned char* outRowStart = output.ptr<unsigned char>(i);
+        for (size_t j = 0; j < hsv.cols*hsv.channels(); j += hsv.channels()) {
+            // Split our channels up into 3 parts
             unsigned char* h = hsvRowStart;
-            unsigned char* b = mRowStart;
-            unsigned char* g = mRowStart + 1;
-            unsigned char* r = mRowStart + 2;
-            if (*h > 0 && *h < 40) {
-                *b = 0;
-                *g = 0;
-                *r = 255;
+            unsigned char* s = hsvRowStart + 1;
+            unsigned char* v = hsvRowStart + 2;
+
+            unsigned char* outptr = outRowStart;
+            if (*h > minColourHSV[0] &&
+                *h < maxColourHSV[0] &&
+                *s > minColourHSV[1] &&
+                *s < maxColourHSV[1] &&
+                *v > minColourHSV[2] &&
+                *v < maxColourHSV[2])
+            {
+                *outptr = 255;
+            } else {
+                *outptr = 0;
             }
-            hsvRowStart += 3;
-            mRowStart += 3;
+
+            // Add the number of channels each one stores.
+            hsvRowStart += hsv.channels();
+            outRowStart += 1;
         }
     }
 }
