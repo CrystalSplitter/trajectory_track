@@ -79,6 +79,14 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
             break;
         }
         
+        // Compute the colour mask.
+        tr::colourMask(
+                shrinkFrame,
+                colourMask,
+                cv::Vec3b(15,150,0),
+                cv::Vec3b(55,255,200)
+        );
+        
         bool trackOkay = tracker->update(greysc, bbox);
         if (trackOkay) {
             cv::rectangle(shrinkFrame, bbox, cv::Scalar(255, 0, 0), 1, 1);
@@ -92,7 +100,7 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
         // Display the resulting frames.
         //cv::imshow("Diff", diffMask);
         output.write(shrinkFrame);
-        cv::imshow("Display Image", shrinkFrame);
+        cv::imshow("Display Image", colourMask);
         cv::waitKey(20);
  
         // Press  ESC on keyboard to exit
@@ -197,7 +205,7 @@ cv::Rect2d tr::clipBBox(cv::Rect2d bbox, double imgW, double imgH)
 }
 
 
-void colourMask(
+void tr::colourMask(
         cv::Mat& m,
         cv::Mat& output,
         cv::Vec3b minColourHSV,

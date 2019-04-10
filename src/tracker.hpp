@@ -17,6 +17,12 @@ namespace tr
     cv::Rect2d getBBox(double centreX, double centreY, double width, double height);
     cv::Rect2d clipBBox(cv::Rect2d bbox, double imgW, double imgH);
     void sharpen(cv::Mat& m);
+    void colourMask(
+            cv::Mat& m,
+            cv::Mat& output,
+            cv::Vec3b colourMinHSV, 
+            cv::Vec3b colourMaxHSV
+    );
 };
 
 #endif /* __TRACKER_HPP__ */
