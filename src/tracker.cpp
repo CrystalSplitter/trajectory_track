@@ -17,6 +17,7 @@ const int TR_NEWWIDTH = 128*2;
 const int TR_BBOX_WIDTH = 35;
 const int TR_BBOX_HEIGHT = 35;
 
+
 int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
 {
     cv::Ptr<cv::Tracker> tracker;
@@ -33,7 +34,7 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
             (int) TR_NEWWIDTH/aspectRatio);
 
     // Open a video output stream.
-    output.open("YAY.avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'),
+    output.open("myYAY.avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'),
                 40, newSize, true);
     
     cv::Mat diffFrame(cv::Mat(newSize, CV_8UC1));
@@ -87,9 +88,12 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
         imgdiff.diffThreshCentre(diffFrame, 20, diffMask);
 
         // Display the resulting frames.
-        cv::imshow("Diff", diffMask);
-        cv::imshow("Frame", shrinkFrame);
+        //cv::imshow("Diff", diffMask);
+        //cv::imshow("Frame", shrinkFrame);
         output.write(shrinkFrame);
+        cv::imshow("Display Image", shrinkFrame);
+        cv::waitKey(0);
+        return 0;
  
         // Press  ESC on keyboard to exit
         if (counter > 360) {
