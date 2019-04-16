@@ -83,8 +83,8 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
         tr::colourMask(
                 shrinkFrame,
                 colourMask,
-                cv::Vec3b(15,150,0),
-                cv::Vec3b(55,255,200)
+                cv::Vec3b(5,100,0),
+                cv::Vec3b(75,255,200)
         );
         
         bool trackOkay = tracker->update(greysc, bbox);
