@@ -6,14 +6,17 @@
 class ImgDiff {
 
 public:
-    static void diff(cv::Mat& to, cv::Mat& from,
-                     cv::Mat& diff, int dilateThresh=0);
+    void diff(cv::Mat& to, cv::Mat& from,
+            cv::Mat& diff, int dilateThresh=0);
     
     /* Calculate the average pixel position of pixels
      * that exceed the threshold in any channel.
      */
-    static cv::Point diffThreshCentre(cv::Mat& diff, unsigned char threshold,
+    cv::Point diffThreshCentre(cv::Mat& diff, unsigned char threshold,
             cv::Mat& output);
+
+    cv::Point centre_;
+    cv::Rect boundingBox_;
 };
 
 #endif /* __IMGDIFF_HPP__ */
