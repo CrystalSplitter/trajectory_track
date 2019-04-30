@@ -18,8 +18,9 @@ const int TR_NEWWIDTH = 128*4;
 const int TR_BBOX_WIDTH = 35;
 const int TR_BBOX_HEIGHT = 35;
 
+const double FPS = 20;
 
-int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
+int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart, std::string outfile)
 {
     cv::Ptr<cv::Tracker> tracker;
     cv::Mat frame;
@@ -35,8 +36,8 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
             (int) TR_NEWWIDTH/aspectRatio);*/
 
     // Open a video output stream.
-    output.open("output.avi", cv::VideoWriter::fourcc('M','J','P','G'),
-                40, newSize, true);
+    output.open(outfile, cv::VideoWriter::fourcc('M','J','P','G'),
+                FPS, newSize, true);
 
     if (!output.isOpened()) {
         throw std::runtime_error("Output video could not be opened.");
@@ -128,46 +129,6 @@ int tr::trackerProc(cv::VideoCapture& vidCap, int frameStart)
     }
     output.release();
     return 0;
-    /*
-
-    cv::Mat src1 = cv::imread("", cv::IMREAD_COLOR);
-    cv::Mat src2 = cv::imread("", cv::IMREAD_COLOR);
-    printf("width: %d\n", src1.cols);
-    printf("height: %d\n", src1.rows);
-
-    auto start = std::chrono::high_resolution_clock::now();
-
-    // Conduct resize.
-    cv::Mat scaled1;
-    cv::Mat scaled2;
-    cv::resize(src1, scaled1, cv::Size(src1.cols/4, src2.rows/4), 0, 0,
-            cv::INTER_NEAREST);
-    cv::resize(src2, scaled2, cv::Size(src2.cols/4, src2.rows/4), 0, 0,
-            cv::INTER_NEAREST);
-
-    // Conduct Box Blurs
-    cv::Mat blur1;
-    cv::Mat blur2;
-    cv::blur(scaled1, blur1, cv::Size(20,20));
-    cv::blur(scaled2, blur2, cv::Size(20,20));
-
-    // Calculate deltas.
-    cv::Mat delta = cv::Mat(blur2.cols, blur2.rows, CV_8UC3);
-    ImgDiff::diff(blur1, blur2, delta, 0);
-    ImgDiff::diffThreshCentre(delta, 50);
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed_seconds = stop - start;
-
-    std::cout << "Calcs Per Sec: " << 1.0/elapsed_seconds.count() << std::endl;
-
-    cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE);
-    printf("swidth: %d\n", delta.cols);
-    printf("sheight: %d\n", delta.rows);
-    cv::imshow("Display Image", delta);
-    cv::waitKey(0);
-    return 0;
-    */
 }
 
 int tr::updateMatrices(

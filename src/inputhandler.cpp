@@ -34,8 +34,16 @@ void InputHandler::readInput(int argc, char* argv[])
         vidPath_ = std::string(resolvedPath);
         useCamera_ = false;
     }
+
     if (argc > 2) {
         frameStart_ = std::stoi(argv[frameStartIndex_]);
+    }
+
+    if (argc > 3) {
+        // We specified the output file.
+        outputFile_ = std::string(argv[outputIndex_]);
+    } else {
+        outputFile_ = std::string("my_output.avi");
     }
 }
 
@@ -47,6 +55,11 @@ std::string InputHandler::vidPath()
 int InputHandler::frameStart()
 {
     return frameStart_;
+}
+
+std::string InputHandler::outputFile()
+{
+    return outputFile_;
 }
 
 bool InputHandler::useCamera()

@@ -3,10 +3,12 @@
 #ifndef __TRACKER_HPP__
 #define __TRACKER_HPP__
 
+#include <string>
+
 static void help(char* progName);
 namespace tr
 {
-    int trackerProc(cv::VideoCapture& vidCap, int frameStart);
+    int trackerProc(cv::VideoCapture& vidCap, int frameStart, std:string outfile);
     int updateMatrices(
             cv::VideoCapture& vidCap,
             cv::Mat& frame,

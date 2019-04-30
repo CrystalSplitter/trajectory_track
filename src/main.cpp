@@ -4,11 +4,12 @@
 #include "inputhandler.hpp"
 #include "tracker.hpp"
 #include "physics/rigidbody.hpp"
+#include "recorder.hpp"
 
 int main(int argc, char* argv[])
 {
     // Set up the input handler to handle any important values.
-    
+
     InputHandler ihandle;
     try {
         ihandle.readInput(argc, argv);
@@ -16,7 +17,7 @@ int main(int argc, char* argv[])
         std::cout << e.what() << std::endl;
         return -1;
     }
-    
+
     std::cout << ihandle.vidPath() << std::endl;
     // capture the video and check validity.
     cv::VideoCapture vidCap;
@@ -43,9 +44,11 @@ int main(int argc, char* argv[])
         }
     }
 
-    tr::trackerProc(vidCap, ihandle.frameStart());
+    //Recorder recorder;
+    //recorder.record(vidCap, 60.0, ihandle.outputFile());
+    tr::trackerProc(vidCap, ihandle.frameStart(), ihandle.outputFile());
     // Release the video.
     vidCap.release();
-    
+
     return 0;
 }
